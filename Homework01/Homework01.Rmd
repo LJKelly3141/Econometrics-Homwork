@@ -1,0 +1,224 @@
+---
+title: "Chapters 4 and 5 Homework"
+author: "Your Name Here"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  word_document:
+    reference_docx: HWSTY.docx
+    highlight: tango
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+if(!require(pacman)) install.packages("pacman")
+library("pacman")
+pacman::p_load("tidyverse","psych","jtools","car","Rmisc","knitr","rmarkdown")
+
+knitr::opts_chunk$set(echo = TRUE, render = knitr::normal_print, 
+                      comment=NA, attr.source='.numberLines')
+```
+
+# Problem 1.
+
+*This problem was adapted from: Chapter 4 problem 4.28 (Principles of econometrics. John Wiley & Sons; 2018).*
+
+The file `data/wa_wheat.csv` contains observations on wheat yield in Western Australian shires. There are 48 annual observations for the years 1950-1997. For the Northampton shire, consider the following four equations:
+
+-   mod1: $YIELD_t = \beta_0+\beta_1 TIME + e_t$
+-   mod2: $YIELD_t = \beta_0+\beta_1 \log(TIME) + e_t$
+-   mod3: $YIELD_t = \beta_0+\beta_1 TIME^2 + e_t$
+-   mod4: $\log(YIELD_t) = \beta_0+\beta_1 TIME + e_t$
+
+### A. Estimate each model.
+
+#### Load and inspect the data
+
+1.  Use `read.csv()` to load the `data/wa_wheat.csv` into a data frame named wheat.
+2.  View `data/wa_wheat.def` by clicking on the file in the Files tab.
+3.  Use `head()` to inspect the first few rows of the data.
+4.  Use `psych::describe()` to display a table of summary statistics.
+
+```{r}
+
+```
+
+#### Estimate models one through four and display summaries of each.
+
+1.  Use `lm()` to estimate each model. Note that the yield for Northampton shire is stored in the series `northampton`.
+2.  Use `jtools::export_summs()` to display a summary of each model in a single table.
+3.  Use the `model.names` argument to name models 1 through 4 "Linear", "Linear-Log", "Quadratic", "Log-Linear", respectively.
+
+```{r}
+
+
+```
+
+### B. Draw plots of actual and fitted values vs. time, and the residuals vs. fit plots for each model.
+
+#### I have provided you with two functions, `plot.time()` and `plot.fitted()`, to help draw the required charts.
+
+```{r plot_fitted, echo=F}
+
+# These two functions will help you. plot.time() will draw the actual and fitted 
+# values vs. time, and plot.fitted() will draw the residuals vs. fit plot. Both 
+# functions need only a linear model as an argument.
+
+plot.time <- function (lmod, ln=F) {
+  require(ggplot2,dplyr)
+  pr <- data.frame(
+    Observation = seq(from = 1, to = nrow(lmod$model)),
+    Actual = if(ln==T) exp(lmod$model[, 1]) else lmod$model[, 1],
+    Fitted = if(ln==T) exp(fitted(lmod)+(summary(lmod)$sigma^2)/2) else fitted(lmod)
+  ) %>% pivot_longer(.,
+                     cols = 2:ncol(.),
+                     names_to = "series",
+                     values_to = "values")  %>%
+    ggplot(aes(x = Observation, y = values, color = series)) +
+    geom_line() +
+    ggtitle(lmod$call) +
+    theme_classic() +
+    scale_color_manual(values = c("#2c7bb6", "#d7191c", "#808080", "#000000")) +
+    theme(
+      legend.position = "bottom",
+      legend.direction = 'horizontal',
+      legend.title = element_blank()
+    )
+  return(pr)
+}
+
+plot.fitted <- function(lmod) {
+  require(ggplot2,dplyr)
+  df = lmod$model
+  title = paste("Residuals vs. Fits (Dependent Variable: ",
+                names(df)[1],
+                ")",
+                sep = "")
+  pr <- df %>% ggplot(aes(x = fitted(lmod), y = resid(lmod))) +
+    geom_ribbon(aes(ymin = -sigma(lmod), ymax = sigma(lmod)),
+                fill = "gray",
+                alpha = .5) +
+    geom_ribbon(aes(ymin = -sigma(lmod) * 2, ymax = sigma(lmod) * 2),
+                fill = "lightgray",
+                alpha = .5) +
+    geom_point() +
+    theme_classic() +
+    ggtitle(title) +
+    ylab("Residules") +
+    xlab("Fitted") +
+    geom_hline(yintercept = 0,
+               linetype = "solid",
+               color = "black")
+  return(pr)  
+}  
+```
+
+#### Use `Rmisc::multiplot()` and `plot.time()` to draw plots of actual and fitted values vs. time. Use `ggtitle()` to label the plot for each model "Linear", "Linear-Log", "Quadratic", and "Log-Linear" e.g. `plot.time(mod1) + ggtitle("Linear")`.
+
+```{r}
+
+
+```
+
+#### Use `Rmisc::multiplot()` and `plot.fitted()` to draw plots of residual vs. fitted values. Label each plot as you did before.
+
+```{r echo=T}
+
+
+```
+
+### C. Calculate the generalized $R^2$ for each model.
+
+#### Use the `cor()` to calculate the generalized $R^2$. Use `data.frame()` to store the data values in a data frame, labeling each the same as the model title.
+
+```{r echo=T}
+
+
+```
+
+### D. Based on your analysis, which of these models is the best. Why?
+
+[Your answer here]
+
+# Problem 2.
+
+*This problem was adapted from: Chapter 5 problems 5.21 and 5.22 (Principles of Econometrics. John Wiley & Sons; 2018).*
+
+Using the data in the file `data/toody5.csv`, estimate the model
+
+$${Y_t} = {\beta _1} + {\beta _2}TREND_t + {\beta _3}RAIN_t + {\beta _4}RAIN_t^2 + {\beta _5}\left( {RAIN_t \times TREND_t} \right) + {e_t}$$ where $Y_t$ = wheat yield in tons per hectare in the Toodyay Shire of Western Australia in year $t$; $TREND_t$ is a trend variable designed to capture technological change; $RAIN_t$ is total rainfall in decimeters (dm) from May to October (the growing season) in year $t$.
+
+### A. Estimate the model.
+
+#### Load the data into a data frame named `toodyay`.
+
+```{r echo=T}
+
+
+```
+
+#### Use `lm()` to estimate the model, store the model in an object named `toodyay.lm`, and use `jtools:summ()` to present a summary of the model.
+
+```{r echo=T}
+
+
+```
+
+### B. Evaluate the model.
+
+#### Plot actual and fitted values vs. time. Use `ggtitle()` to lable the plot "Wheat yield for the Toodyay Shire of Western Australia."
+
+```{r}
+
+
+```
+
+#### Evaluate the overall fit
+
+[Your answer here]
+
+#### Plot the residual vs. fitted values.
+
+```{r}
+
+
+```
+
+#### Evaluate residual vs. fitted values plot.
+
+[Your answer here]
+
+## C. Estimate a log-linear form of this model, i.e.
+
+$$\log {Y_t} = {\beta _1} + {\beta _2}TREND_t + {\beta _3}RAIN_t + {\beta _4}RAIN_t^2 + {\beta _5}\left( {RAIN_t \times TREND_t} \right) + {e_t}$$
+
+#### Estimate and summarize the model.
+
+```{r echo=T}
+
+
+```
+
+#### Plot actual and fitted values vs. time. Remember to label the plot.
+
+```{r}
+
+
+```
+
+#### Plot the residual vs. fitted values.
+
+```{r}
+
+
+```
+
+#### Calculate the generalized $R^2$ for both the linear and log models, and store those in a data frame.
+
+```{r echo=T}
+
+
+```
+
+### D. Evaluate which model is the best.
+
+[Your answer here]
