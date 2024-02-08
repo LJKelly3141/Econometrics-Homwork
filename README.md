@@ -2,8 +2,6 @@
 
 Welcome to the GitHub repository for ECON 426: Econometrics! This repository is dedicated to providing students with the necessary materials for completing their homework assignments throughout the course.
 
-## Test Push
-
 ## Repository Structure
 
 - **Homework Assignments:** Each homework assignment is organized within its own dedicated folder. Navigate to the respective folder to find the assignment you're working on.
