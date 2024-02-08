@@ -1,7 +1,3 @@
-# Econometrics Homwork
-
-This GitHub repository contains homework assignments and accompanying data sets for the Econometrics course, ECON 426.
-
 # ECON 426: Econometrics Homework Repository
 
 Welcome to the GitHub repository for ECON 426: Econometrics! This repository is dedicated to providing students with the necessary materials for completing their homework assignments throughout the course.
