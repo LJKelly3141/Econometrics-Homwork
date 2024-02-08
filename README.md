@@ -6,8 +6,6 @@ Welcome to the GitHub repository for ECON 426: Econometrics! This repository is 
 
 - **Homework Assignments:** Each homework assignment is organized within its own dedicated folder. Navigate to the respective folder to find the assignment you're working on.
 
-- **Data Directory:** All datasets required for the homework assignments can be found in the `data` folder. This centralized data repository makes it easy to access and manage the datasets needed for your analyses.
-
 - **Homework Files:** The core of each homework assignment is a file named `Homework##.Rmd`, where `##` corresponds to the homework assignment number (e.g., `Homework01.Rmd`, `Homework02.Rmd`, etc.). These files are written in RMarkdown and contain instructions, questions, and code chunks for completing the assignment.
 
 - **Assignment Resources:** Within each homework folder, alongside the `Homework##.Rmd` file, you may find additional files or resources referenced within the RMarkdown document. These may include supplementary data files, scripts, or external links necessary for completing the assignments.
