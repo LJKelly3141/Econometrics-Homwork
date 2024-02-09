@@ -1,0 +1,213 @@
+---
+title: "Homework 02"
+author: "Your Name"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+format:
+  docx:
+    reference-doc: "HWSTY.docx"
+    toc: false
+    number-sections: true
+    highlight-style: github
+---
+
+```{r setup, include=FALSE}
+if (!require("pacman")) install.packages("pacman")
+
+pacman::p_load("tidyverse","psych","jtools",
+               "car","Rmisc","knitr","rmarkdown",
+               "modelr")
+
+knitr::opts_chunk$set(echo = TRUE, render = knitr::normal_print, comment=NA, attr.source='.numberLines')
+
+```
+
+# Problem 1: Home sales in Baton Rouge, Louisiana
+
+*This problem was adapted from: Chapters 6 and 7 problems 6.17, 6.20, and 7.26 (Principles of Econometrics. John Wiley & Sons; 2018).*
+
+The data file `data/br.csv` contains data on 1080 house sales in Baton Rouge, Louisiana, during July and August 2005. The variables are defined in `data/br.def`. Example 6.16 uses this data to estimate the following model:
+
+$$\log PRICE = \beta_1 + \beta_2 AGE + \beta_3 SQFT + \beta_4 AGE^2 + e$$
+
+In this exercise, we will investigate whether we can improve on this model by adding various characteristics of the homes.
+
+## Compare the following three models.
+
+-   mod1: $\log PRICE = \beta_1 + \beta_2 AGE + \beta_3 SQFT + \beta_4 AGE^2 + e$
+-   mod2: $\log PRICE = \beta_1 + \beta_2 AGE + \beta_3 SQFT + \beta_4 AGE^2 + \beta_5 BATHS + e$
+-   mod2: $\log PRICE = \beta_1 + \beta_2 AGE + \beta_3 SQFT + \beta_4 AGE^2 + \beta_5 BATHS + \beta_5 BEDROOMS + e$
+
+### Load the data into a data frame named house
+
+```{r}
+# YOUR ANSWER HERE
+
+```
+
+### Hold out 200 observations as a test set and use remaining observations as a training set.
+
+```{r}
+# YOUR ANSWER HERE
+
+```
+
+### Use the training set to estimate each model.
+
+```{r warning=F}
+# YOUR ANSWER HERE
+
+```
+
+### Output the summary of each model along with $R^2$, AIC, BIC by ussing the `jtools::export_summs` function and setting the `statistics` argument as follows, `statistics = c(N = "nobs",R2 = "r.squared",AIC = "AIC",BIC = "BIC")`.
+
+```{r warning=F}
+# YOUR ANSWER HERE
+
+```
+
+### Calculate and display the out-of-sample RMSE, MAPE and $R^2$
+
+```{r}
+# YOUR ANSWER HERE
+
+```
+
+## Evaluate the models.
+
+### Based on results from part A, which model would you choose? Why?
+
+*YOUR ANSWER HERE*
+
+### Use the `plot.fitted()` function defined in the chunk below to analyze the residuals from the "winning" model.
+
+```{r echo=F}
+plot.fitted <- function(lmod) {
+  require(ggplot2,dplyr)
+  df = lmod$model
+  title = paste("Residuals vs. Fits (Dependent Variable: ",
+                names(df)[1],
+                ")",
+                sep = "")
+  pr <- df %>% ggplot(aes(x = fitted(lmod), y = resid(lmod))) +
+    geom_ribbon(aes(ymin = -sigma(lmod), ymax = sigma(lmod)),
+                fill = "gray",
+                alpha = .5) +
+    geom_ribbon(aes(ymin = -sigma(lmod) * 2, ymax = sigma(lmod) * 2),
+                fill = "lightgray",
+                alpha = .5) +
+    geom_point() +
+    theme_classic() +
+    ggtitle(title) +
+    ylab("Residules") +
+    xlab("Fitted") +
+    geom_hline(yintercept = 0,
+               linetype = "solid",
+               color = "black")
+  return(pr)  
+}
+```
+
+```{r}
+# YOUR ANSWER HERE
+
+```
+
+## Add categorical data to the model.
+
+### Create a new variable named `traditional` as follows
+
+`house$traditional <- ifelse(house$style == 1,1,0)`
+
+```{r}
+# YOUR ANSWER HERE
+
+```
+
+### Add the indicator variables `WATERFRONT`, `TRADITIONAL` and the interaction between `WATERFRONT` and `TRADITIONAL` to your winning model from parts A and B. Display a summary of the model.
+
+```{r}
+# YOUR ANSWER HERE
+
+```
+
+### Interpret the coefficients of each of the new independent variables.
+
+*YOUR ANSWER HERE*
+
+## Conduct a Chow test on the model from the previous section.
+
+### Test the model from the previous section to determine if houses with and without pools can be pooled together. Store the unrestricted model in an object named mod5.
+
+```{r}
+# YOUR ANSWER HERE
+
+```
+
+### Draw the residual vs fitted values plot for mod5. Based on this plot and the results from the Chow test, can we group together homes with and without pools?
+
+```{r}
+# YOUR ANSWER HERE
+
+```
+
+### Using the training set, re-estimate mod5 omitting all insignificant variables. Store this model in an object named mod6.
+
+```{r warning=F}
+# YOUR ANSWER HERE
+
+```
+
+### Calculate the simulated out of sample performance of mod5 and mod6.
+
+```{r}
+# YOUR ANSWER HERE
+
+```
+
+### Provide a bullet-point summary of your analysis and conclusions.
+
+*YOUR ANSWER HERE*
+
+# Problem 2.
+
+*This problem was adapted from: Chapter 7 problem 7.13 and 7.24 (Principles of econometrics. John Wiley & Sons; 2018).*
+
+*Many cities in California have passed Inclusionary Zoning policies (also known as below-market housing mandates) as an attempt to make housing more affordable. These policies require developers to sell some units below the market price on a percentage of the new homes built. For example, in a development of 10 new homes each with market value \$850,000, the developer may have to sell 5 of the units at \$180,000. Means and Stringham (2012) examine the effects of such policies on house prices and number of housing units available using 1990 and 2000 census data on California cities. Use the data file `data/means.csv` for this problem.*
+
+## Consider the following two models.
+
+-   mod1: $\log PRICE_{it} = \beta_1 + \beta_2 IZLAW_i +\beta_3 D_t + \delta (IZLAW_i \times D_t)+e_{it}$
+-   mod2: $\log UNITS_{it} = \beta_1 + \beta_2 IZLAW_i +\beta_3 D_t + \delta (IZLAW_i \times D_t)+e_{it}$
+
+### Load the data into a data frame named zoning
+
+```{r}
+# YOUR ANSWER HERE
+
+```
+
+### Estimate difference-in-difference statistic for mod1 and mod2
+
+```{r}
+# YOUR ANSWER HERE
+
+```
+
+### Interpret the difference-in-difference statistic for mod1 and mod2. Is the estimate of the treatment effect significant and of the expected sign?
+
+*YOUR ANSWER HERE*
+
+## Add the log of median household income, `lmedhhinc`, to mod1 and mod2, and name the resulting models mod3 and mod4.
+
+```{r}
+# YOUR ANSWER HERE
+
+```
+
+## Interpret the estimates of the new variables, including sign and significance.
+
+*YOUR ANSWER HERE*
+
+## How does this addition affect the estimates of the treatment effect?
+
+*YOUR ANSWER HERE*
