@@ -35,7 +35,7 @@ In this exercise, we will investigate whether we can improve on this model by ad
 
 -   mod1: $\log PRICE = \beta_1 + \beta_2 AGE + \beta_3 SQFT + \beta_4 AGE^2 + e$
 -   mod2: $\log PRICE = \beta_1 + \beta_2 AGE + \beta_3 SQFT + \beta_4 AGE^2 + \beta_5 BATHS + e$
--   mod2: $\log PRICE = \beta_1 + \beta_2 AGE + \beta_3 SQFT + \beta_4 AGE^2 + \beta_5 BATHS + \beta_5 BEDROOMS + e$
+-   mod3: $\log PRICE = \beta_1 + \beta_2 AGE + \beta_3 SQFT + \beta_4 AGE^2 + \beta_5 BATHS + \beta_5 BEDROOMS + e$
 
 ### Load the data into a data frame named house
 
